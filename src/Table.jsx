@@ -36,6 +36,10 @@ function Table({ issues }) {
     return updatedIssues.every((issue) => issue.checked);
   }, [updatedIssues]);
 
+  const issuesSelectedAmount = useMemo(() => {
+    return updatedIssues.reduce((acc, issue) => (acc += issue.checked ? 1 : 0), 0);
+  }, [updatedIssues]);
+
   /* 
   
   
@@ -159,16 +163,13 @@ function Table({ issues }) {
             <input
               className={classes.checkbox}
               type='checkbox'
-              id={'custom-checkbox-selectDeselectAll'}
-              name={'custom-checkbox-selectDeselectAll'}
-              value={'custom-checkbox-selectDeselectAll'}
               checked={isAllIssuesCheckboxChecked}
               onChange={handleAllIssuesCheckboxChange}
             />
           </th>
           <th className={classes.numChecked}>
-            {numCheckboxesSelected
-              ? `Selected ${numCheckboxesSelected}`
+            {issuesSelectedAmount > 0
+              ? `Selected ${issuesSelectedAmount}`
               : 'None selected'}
           </th>
         </tr>
