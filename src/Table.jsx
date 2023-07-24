@@ -38,19 +38,23 @@ function Table({ issues }) {
     });
   };
 
-  /**
-   * !Consideration
-   * Possibly combine the 2 useMemo together as they depend
-   * on the same dependency value.
-   */
-  const isAllIssuesCheckboxChecked = useMemo(() => {
-    return updatedIssues
-      .filter((issue) => issue.status === 'open')
-      .every((issue) => issue.checked);
-  }, [updatedIssues]);
+  const {
+    isAllIssuesCheckboxChecked,
+    issuesSelectedAmount,
+    shouldCheckboxBeIndeterminate,
+  } = useMemo(() => {
+    const issuesOpenStatus = updatedIssues.filter((issue) => issue.status === 'open');
+    const issuesSelectedAmount = updatedIssues.reduce(
+      (acc, issue) => (acc += issue.checked ? 1 : 0),
+      0
+    );
 
-  const issuesSelectedAmount = useMemo(() => {
-    return updatedIssues.reduce((acc, issue) => (acc += issue.checked ? 1 : 0), 0);
+    return {
+      shouldCheckboxBeIndeterminate:
+        issuesSelectedAmount > 0 && issuesSelectedAmount < issuesOpenStatus.length,
+      isAllIssuesCheckboxChecked: issuesOpenStatus.every((issue) => issue.checked),
+      issuesSelectedAmount,
+    };
   }, [updatedIssues]);
 
   const allIssuesCheckboxLabel =
@@ -64,13 +68,8 @@ function Table({ issues }) {
    * issue with status "open"
    */
   useEffect(() => {
-    const issuesOpenStatus = updatedIssues.filter((issue) => issue.status === 'open');
-
-    const indeterminateValue =
-      issuesSelectedAmount > 0 && issuesSelectedAmount < issuesOpenStatus.length;
-
-    allIssuesCheckboxRef.current.indeterminate = indeterminateValue;
-  }, [issuesSelectedAmount, updatedIssues]);
+    allIssuesCheckboxRef.current.indeterminate = shouldCheckboxBeIndeterminate;
+  }, [shouldCheckboxBeIndeterminate]);
 
   /* 
   
