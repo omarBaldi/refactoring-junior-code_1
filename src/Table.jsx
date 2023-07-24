@@ -66,11 +66,10 @@ function Table({ issues }) {
   useEffect(() => {
     const issuesOpenStatus = updatedIssues.filter((issue) => issue.status === 'open');
 
-    if (issuesSelectedAmount > 0 && issuesSelectedAmount < issuesOpenStatus.length) {
-      allIssuesCheckboxRef.current.indeterminate = true;
-    } else {
-      allIssuesCheckboxRef.current.indeterminate = false;
-    }
+    const indeterminateValue =
+      issuesSelectedAmount > 0 && issuesSelectedAmount < issuesOpenStatus.length;
+
+    allIssuesCheckboxRef.current.indeterminate = indeterminateValue;
   }, [issuesSelectedAmount, updatedIssues]);
 
   /* 
