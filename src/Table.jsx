@@ -182,41 +182,28 @@ function Table({ issues }) {
       </thead>
 
       <tbody>
-        {updatedIssues.map(({ name, message, status, id, checked }, index) => {
-          let issueIsOpen = status === 'open';
-          let onClick = issueIsOpen ? () => handleOnChange(index) : null;
-          let stylesTr = issueIsOpen ? classes.openIssue : classes.resolvedIssue;
+        {updatedIssues.map(({ id, name, message, status, checked }, index) => {
+          const isIssueOpen = status === 'open';
 
           return (
             <tr
-              className={stylesTr}
+              key={id}
+              className={isIssueOpen ? classes.openIssue : classes.resolvedIssue}
               style={checkedState[index]}
-              key={index}
-              onClick={onClick}
             >
               <td>
-                {issueIsOpen ? (
-                  <input
-                    className={classes.checkbox}
-                    type='checkbox'
-                    id={`custom-checkbox-${index}`}
-                    name={name}
-                    value={name}
-                    checked={checked}
-                    onChange={handleIssueCheckboxChange(id)}
-                  />
-                ) : (
-                  <input className={classes.checkbox} type={'checkbox'} disabled />
-                )}
+                <input
+                  className={classes.checkbox}
+                  type='checkbox'
+                  disabled={!isIssueOpen}
+                  checked={checked}
+                  onChange={handleIssueCheckboxChange(id)}
+                />
               </td>
               <td>{name}</td>
               <td>{message}</td>
               <td>
-                {issueIsOpen ? (
-                  <span className={classes.greenCircle} />
-                ) : (
-                  <span className={classes.redCircle} />
-                )}
+                <span className={isIssueOpen ? classes.greenCircle : classes.redCircle} />
               </td>
             </tr>
           );
