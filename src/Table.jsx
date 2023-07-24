@@ -28,17 +28,30 @@ function Table({ issues }) {
     const updatedCheckedValue = e.target.checked;
 
     setUpdatedIssues((prevIssues) => {
-      return [...prevIssues].map((issue) => ({ ...issue, checked: updatedCheckedValue }));
+      return [...prevIssues].map((issue) => ({
+        ...issue,
+        ...(issue.status === 'open' && { checked: updatedCheckedValue }),
+      }));
     });
   };
 
+  /**
+   * !Consideration
+   * Possibly combine the 2 useMemo together as they depend
+   * on the same dependency value.
+   */
   const isAllIssuesCheckboxChecked = useMemo(() => {
-    return updatedIssues.every((issue) => issue.checked);
+    return updatedIssues
+      .filter((issue) => issue.status === 'open')
+      .every((issue) => issue.checked);
   }, [updatedIssues]);
 
   const issuesSelectedAmount = useMemo(() => {
     return updatedIssues.reduce((acc, issue) => (acc += issue.checked ? 1 : 0), 0);
   }, [updatedIssues]);
+
+  const allIssuesCheckboxLabel =
+    issuesSelectedAmount > 0 ? `Selected ${issuesSelectedAmount}` : 'None selected';
 
   /* 
   
@@ -167,11 +180,7 @@ function Table({ issues }) {
               onChange={handleAllIssuesCheckboxChange}
             />
           </th>
-          <th className={classes.numChecked}>
-            {issuesSelectedAmount > 0
-              ? `Selected ${issuesSelectedAmount}`
-              : 'None selected'}
-          </th>
+          <th className={classes.numChecked}>{allIssuesCheckboxLabel}</th>
         </tr>
         <tr>
           <th />
@@ -182,14 +191,14 @@ function Table({ issues }) {
       </thead>
 
       <tbody>
-        {updatedIssues.map(({ id, name, message, status, checked }, index) => {
+        {updatedIssues.map(({ id, name, message, status, checked }) => {
           const isIssueOpen = status === 'open';
 
           return (
             <tr
               key={id}
               className={isIssueOpen ? classes.openIssue : classes.resolvedIssue}
-              style={checkedState[index]}
+              style={{ backgroundColor: checked ? '#eeeeee' : '#ffffff' }}
             >
               <td>
                 <input
