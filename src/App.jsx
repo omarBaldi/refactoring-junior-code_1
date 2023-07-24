@@ -1,7 +1,6 @@
-import Table from "./Table";
-import issues from "./issues";
+import Table from './Table';
+import issues from './issues';
 
-function App() {
+export default function App() {
   return <Table issues={issues} />;
 }
-export default App;

@@ -1,15 +1,60 @@
-import { useState } from "react";
-import classes from "./Table.module.css";
+import { useState } from 'react';
+import classes from './Table.module.css';
 
 function Table({ issues }) {
+  //* *------------------------------------ NEW CODE
+  const [updatedIssues, setUpdatedIssues] = useState(() => {
+    return issues.map((issue, index) => ({
+      ...issue,
+      id: index.toString().padStart(3, '0'),
+      checked: false,
+    }));
+  });
+
+  const handleIssueCheckboxChange = (issueToUpdateId) => {
+    return (e) => {
+      const updatedCheckedValue = e.target.checked;
+
+      setUpdatedIssues((prevIssues) => {
+        return [...prevIssues].map((issue) => ({
+          ...issue,
+          ...(issue.id === issueToUpdateId && { checked: updatedCheckedValue }),
+        }));
+      });
+    };
+  };
+
+  /* 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  */
   const [checkedState, setCheckedState] = useState(
     new Array(issues.length).fill({
       checked: false,
-      backgroundColor: "#ffffff",
+      backgroundColor: '#ffffff',
     })
   );
-  const [selectDeselectAllIsChecked, setSelectDeselectAllIsChecked] =
-    useState(false);
+
+  const [selectDeselectAllIsChecked, setSelectDeselectAllIsChecked] = useState(false);
+
   const [numCheckboxesSelected, setNumCheckboxesSelected] = useState(0);
 
   const handleOnChange = (position) => {
@@ -18,7 +63,7 @@ function Table({ issues }) {
         return {
           ...element,
           checked: !element.checked,
-          backgroundColor: element.checked ? "#ffffff" : "#eeeeee",
+          backgroundColor: element.checked ? '#ffffff' : '#eeeeee',
         };
       }
       return element;
@@ -40,12 +85,12 @@ function Table({ issues }) {
 
   const handleIndeterminateCheckbox = (total) => {
     const indeterminateCheckbox = document.getElementById(
-      "custom-checkbox-selectDeselectAll"
+      'custom-checkbox-selectDeselectAll'
     );
     let count = 0;
 
     issues.forEach((element) => {
-      if (element.status === "open") {
+      if (element.status === 'open') {
         count += 1;
       }
     });
@@ -69,23 +114,23 @@ function Table({ issues }) {
 
     const allTrueArray = [];
     issues.forEach((element) => {
-      if (element.status === "open") {
-        allTrueArray.push({ checked: true, backgroundColor: "#eeeeee" });
+      if (element.status === 'open') {
+        allTrueArray.push({ checked: true, backgroundColor: '#eeeeee' });
       } else {
-        allTrueArray.push({ checked: false, backgroundColor: "#ffffff" });
+        allTrueArray.push({ checked: false, backgroundColor: '#ffffff' });
       }
     });
 
     const allFalseArray = new Array(issues.length).fill({
       checked: false,
-      backgroundColor: "#ffffff",
+      backgroundColor: '#ffffff',
     });
     checked ? setCheckedState(allTrueArray) : setCheckedState(allFalseArray);
 
     const totalSelected = (checked ? allTrueArray : allFalseArray)
       .map((element) => element.checked)
       .reduce((sum, currentState, index) => {
-        if (currentState && issues[index].status === "open") {
+        if (currentState && issues[index].status === 'open') {
           return sum + issues[index].value;
         }
         return sum;
@@ -101,10 +146,10 @@ function Table({ issues }) {
           <th>
             <input
               className={classes.checkbox}
-              type={"checkbox"}
-              id={"custom-checkbox-selectDeselectAll"}
-              name={"custom-checkbox-selectDeselectAll"}
-              value={"custom-checkbox-selectDeselectAll"}
+              type={'checkbox'}
+              id={'custom-checkbox-selectDeselectAll'}
+              name={'custom-checkbox-selectDeselectAll'}
+              value={'custom-checkbox-selectDeselectAll'}
               checked={selectDeselectAllIsChecked}
               onChange={handleSelectDeselectAll}
             />
@@ -112,7 +157,7 @@ function Table({ issues }) {
           <th className={classes.numChecked}>
             {numCheckboxesSelected
               ? `Selected ${numCheckboxesSelected}`
-              : "None selected"}
+              : 'None selected'}
           </th>
         </tr>
         <tr>
@@ -124,12 +169,10 @@ function Table({ issues }) {
       </thead>
 
       <tbody>
-        {issues.map(({ name, message, status }, index) => {
-          let issueIsOpen = status === "open";
+        {updatedIssues.map(({ name, message, status, id }, index) => {
+          let issueIsOpen = status === 'open';
           let onClick = issueIsOpen ? () => handleOnChange(index) : null;
-          let stylesTr = issueIsOpen
-            ? classes.openIssue
-            : classes.resolvedIssue;
+          let stylesTr = issueIsOpen ? classes.openIssue : classes.resolvedIssue;
 
           return (
             <tr
@@ -142,19 +185,15 @@ function Table({ issues }) {
                 {issueIsOpen ? (
                   <input
                     className={classes.checkbox}
-                    type={"checkbox"}
+                    type='checkbox'
                     id={`custom-checkbox-${index}`}
                     name={name}
                     value={name}
                     checked={checkedState[index].checked}
-                    onChange={() => handleOnChange(index)}
+                    onChange={handleIssueCheckboxChange(id)}
                   />
                 ) : (
-                  <input
-                    className={classes.checkbox}
-                    type={"checkbox"}
-                    disabled
-                  />
+                  <input className={classes.checkbox} type={'checkbox'} disabled />
                 )}
               </td>
               <td>{name}</td>
