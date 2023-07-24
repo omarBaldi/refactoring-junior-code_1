@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import classes from './Table.module.css';
 
 function Table({ issues }) {
@@ -23,6 +23,18 @@ function Table({ issues }) {
       });
     };
   };
+
+  const handleAllIssuesCheckboxChange = (e) => {
+    const updatedCheckedValue = e.target.checked;
+
+    setUpdatedIssues((prevIssues) => {
+      return [...prevIssues].map((issue) => ({ ...issue, checked: updatedCheckedValue }));
+    });
+  };
+
+  const isAllIssuesCheckboxChecked = useMemo(() => {
+    return updatedIssues.every((issue) => issue.checked);
+  }, [updatedIssues]);
 
   /* 
   
@@ -146,12 +158,12 @@ function Table({ issues }) {
           <th>
             <input
               className={classes.checkbox}
-              type={'checkbox'}
+              type='checkbox'
               id={'custom-checkbox-selectDeselectAll'}
               name={'custom-checkbox-selectDeselectAll'}
               value={'custom-checkbox-selectDeselectAll'}
-              checked={selectDeselectAllIsChecked}
-              onChange={handleSelectDeselectAll}
+              checked={isAllIssuesCheckboxChecked}
+              onChange={handleAllIssuesCheckboxChange}
             />
           </th>
           <th className={classes.numChecked}>
@@ -169,7 +181,7 @@ function Table({ issues }) {
       </thead>
 
       <tbody>
-        {updatedIssues.map(({ name, message, status, id }, index) => {
+        {updatedIssues.map(({ name, message, status, id, checked }, index) => {
           let issueIsOpen = status === 'open';
           let onClick = issueIsOpen ? () => handleOnChange(index) : null;
           let stylesTr = issueIsOpen ? classes.openIssue : classes.resolvedIssue;
@@ -189,7 +201,7 @@ function Table({ issues }) {
                     id={`custom-checkbox-${index}`}
                     name={name}
                     value={name}
-                    checked={checkedState[index].checked}
+                    checked={checked}
                     onChange={handleIssueCheckboxChange(id)}
                   />
                 ) : (
