@@ -1,8 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import classes from './Table.module.css';
 
 function Table({ issues }) {
   //* *------------------------------------ NEW CODE
+
+  const allIssuesCheckboxRef = useRef(null);
+
   const [updatedIssues, setUpdatedIssues] = useState(() => {
     return issues.map((issue, index) => ({
       ...issue,
@@ -52,6 +55,23 @@ function Table({ issues }) {
 
   const allIssuesCheckboxLabel =
     issuesSelectedAmount > 0 ? `Selected ${issuesSelectedAmount}` : 'None selected';
+
+  /**
+   * @description
+   * Apply indeterminate property to checkbox
+   * only if the total amount of issues checked
+   * is greater than 0 and less than the total amount of
+   * issue with status "open"
+   */
+  useEffect(() => {
+    const issuesOpenStatus = updatedIssues.filter((issue) => issue.status === 'open');
+
+    if (issuesSelectedAmount > 0 && issuesSelectedAmount < issuesOpenStatus.length) {
+      allIssuesCheckboxRef.current.indeterminate = true;
+    } else {
+      allIssuesCheckboxRef.current.indeterminate = false;
+    }
+  }, [issuesSelectedAmount, updatedIssues]);
 
   /* 
   
@@ -174,6 +194,7 @@ function Table({ issues }) {
         <tr>
           <th>
             <input
+              ref={allIssuesCheckboxRef}
               className={classes.checkbox}
               type='checkbox'
               checked={isAllIssuesCheckboxChecked}
